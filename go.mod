@@ -1,4 +1,4 @@
-module github.com/tybritten/ce-webhook-sender
+module github.com/tybritten/hpa-sender
 
 go 1.15
 
