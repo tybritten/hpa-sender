@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hpa-sender
+  namespace: knative-eventing
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hpa-sender
+rules:
+- apiGroups: ["", "autoscaling"] # "" indicates the core API group
+  resources: ["secrets", "horizontalpodautoscalers"]
+  verbs: ["get", "watch", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hpa-sender
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hpa-sender
+subjects:
+- kind: ServiceAccount
+  name: hpa-sender
+  namespace: knative-eventing
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hpa-sender
+  namespace: knative-eventing
+  labels:
+    app: hpa-sender
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hpa-sender
+  template:
+    metadata:
+      labels:
+        app: hpa-sender
+    spec:
+      serviceAccountName: hpa-sender
+      containers:
+      - name: hpa-sender
+        image: vmtyler/hpa-sender
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hpa-sender
+  namespace: knative-eventing
+spec:
+  selector:
+    app: hpa-sender
+  ports:
+    - protocol: TCP
+      port: 80  
+      targetPort: 8080
+
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: hpa-sender-trigger
+  namespace: knative-eventing
+spec:
+  broker: default
+  subscriber:
+    uri: http://hpa-sender.knative-eventing.svc.cluster.local
