@@ -91,13 +91,9 @@ func sendmessage(timestamp string, message string, secretloc string) {
 func prepMessage(message string, timestamp string, secret map[string][]byte) SecretData {
 	var secretstruct SecretData
 	json.Unmarshal(secret["headers"], &secretstruct.Headers)
-	fmt.Print(string(secret["body"]))
 	b1 := bytes.ReplaceAll(secret["body"], []byte("_message_"), []byte(message))
-	fmt.Print(string(b1))
 	b2 := bytes.ReplaceAll(b1, []byte("_time_"), []byte(timestamp))
-	fmt.Print(string(b2))
 	json.Unmarshal(b2, &secretstruct.Body)
-	fmt.Print(secretstruct.Body)
 	secretstruct.URL = string(secret["url"])
 	return secretstruct
 }
