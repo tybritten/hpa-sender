@@ -78,9 +78,9 @@ func gethpa(name string, namespace string) ([]byte, error) {
 		annotations := hpaobj.GetAnnotations()
 		if event, ok := annotations["hpa-event"]; ok {
 			return []byte(event), nil
-		} else {
-			return nil, nil
 		}
+		return nil, nil
+
 	}
 
 }
@@ -123,12 +123,13 @@ func checkhpa(name string, namespace string) (secret string, Error error) {
 		if _, ok := annotations["hpa-event"]; ok {
 			ret := annotations["hpa-event"]
 			return ret, nil
-		} else {
-			return "", nil
 		}
+		return "", nil
+
 	}
 }
 
+// SecretData contains the data to send to the webhook for that particular HPA
 type SecretData struct {
 	Body    map[string]string `json:"body"`
 	Headers map[string]string `json:"headers"`

@@ -12,7 +12,8 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
 
-type EventData struct {
+type eventdata struct {
+	//
 	FirstTimestamp string `json:"firstTimestamp"`
 	InvolvedObject struct {
 		APIVersion string `json:"apiVersion"`
@@ -45,7 +46,7 @@ func main() {
 }
 
 func receive(ctx context.Context, event cloudevents.Event) {
-	data := &EventData{}
+	data := &eventdata{}
 	if err := event.DataAs(data); err != nil {
 		fmt.Printf("Got Data Error: %s\n", err.Error())
 	}

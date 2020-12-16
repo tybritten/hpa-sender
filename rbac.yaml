@@ -1,24 +1,29 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  namespace: default
-  name: ce-webhook-sender
+  name: hpa-sender
+  namespace: knative-eventing
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hpa-sender
 rules:
-- apiGroups: [""] # "" indicates the core API group
-  resources: ["secrets", "horizonalpodautoscalers"]
+- apiGroups: ["", "autoscaling"] # "" indicates the core API group
+  resources: ["secrets", "horizontalpodautoscalers"]
   verbs: ["get", "watch", "list"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: ce-webhook-sender-binding
-  namespace: default
+  name: hpa-sender
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: ce-webhook-sender
+  kind: ClusterRole
+  name: hpa-sender
 subjects:
 - kind: ServiceAccount
-  name: default
-  namespace: default
+  name: hpa-sender
+  namespace: knative-eventing
+
