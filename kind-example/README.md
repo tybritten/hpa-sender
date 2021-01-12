@@ -20,7 +20,7 @@ Then save and apply it
 To check on the app
 'kubectl get pods'
 and the HPA
-`kubectl get hpas`
+`kubectl get hpa`
 
 Now we can cause the load to go up and down by following the instructions [here](https://unofficial-kubernetes.readthedocs.io/en/latest/tasks/run-application/horizontal-pod-autoscale-walkthrough/)
 
