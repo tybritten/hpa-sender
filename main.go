@@ -65,35 +65,36 @@ func receive(ctx context.Context, event cloudevents.Event) {
 func sendmessage(timestamp string, message string, secretloc string) {
 	secret, err := getsecret(secretloc)
 	data := prepMessage(message, timestamp, secret)
-
-	reqBody, err := json.Marshal(data.Body)
-	b := bytes.NewBuffer(reqBody)
+	b := bytes.NewBuffer(data.Body)
 	req, err := http.NewRequest("POST", data.URL, b)
 	if err != nil {
-		print(err)
+		print(err.Error())
 	}
+	req.Header.Set("Content-Type", "application/json")
 	for k, v := range data.Headers {
 		req.Header.Set(k, v)
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		print(err)
+		print(err.Error())
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	fmt.Printf("Response: %+v\n", string(body))
 	if err != nil {
-		print(err)
+		print(err.Error())
 	}
 
 }
 
 func prepMessage(message string, timestamp string, secret map[string][]byte) SecretData {
 	var secretstruct SecretData
-	json.Unmarshal(secret["headers"], &secretstruct.Headers)
+	err := json.Unmarshal(secret["headers"], &secretstruct.Headers)
+	if err != nil {
+		print(err.Error())
+	}
 	b1 := bytes.ReplaceAll(secret["body"], []byte("_message_"), []byte(message))
-	b2 := bytes.ReplaceAll(b1, []byte("_time_"), []byte(timestamp))
-	json.Unmarshal(b2, &secretstruct.Body)
+	secretstruct.Body = bytes.ReplaceAll(b1, []byte("_time_"), []byte(timestamp))
 	secretstruct.URL = string(secret["url"])
 	return secretstruct
 }

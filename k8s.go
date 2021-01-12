@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -131,7 +132,7 @@ func checkhpa(name string, namespace string) (secret string, Error error) {
 
 // SecretData contains the data to send to the webhook for that particular HPA
 type SecretData struct {
-	Body    map[string]string `json:"body"`
+	Body    json.RawMessage   `json:"body"`
 	Headers map[string]string `json:"headers"`
 	URL     string            `json:"url"`
 }
